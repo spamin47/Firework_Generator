@@ -32,9 +32,16 @@ var firework_properties = {
 var fireworks = [];
 var particles = [];
 let turn = 1;
+var firework_explosion_SFX = []
+var firework_trail_SFX = []
+
 // var mic;
 function preload(){
-
+  firework_explosion_SFX[0] = loadSound("soundFX/FireworkExplosionSFX_1.mp3")
+  firework_explosion_SFX[1] = loadSound("soundFX/FireworkExplosionSFX_2.mp3")
+  firework_explosion_SFX[2] = loadSound("soundFX/FireworkExplosionSFX_3.mp3")
+  
+  firework_trail_SFX[0] = loadSound("soundFX/FireworkTrailSFX_1.mp3")
 }
 
 function setup() {
@@ -78,6 +85,7 @@ function windowResized() {
 //create firework at mouse position
 function mouseClicked(){
   firework_explosion_properties.color = [random(10,255),random(10,255),random(10,255)]
+  //firework_explosion_SFX1.play();
   fireworks.push(
     new Firework
       (
@@ -90,6 +98,8 @@ function mouseClicked(){
         createVector(random(-2,2),-10), //starting velocity
         createVector(0,0.09), //acceleration
         0, //explosion delay
+        firework_explosion_SFX,
+        firework_trail_SFX,
       )
     )
 }

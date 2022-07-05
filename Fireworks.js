@@ -1,5 +1,8 @@
 
 class Firework{
+    //SFX
+    #explosionSFX;
+    #trailSFX;
     //private arrays for storing particles
     #explosionParticles = []
     #particleTrail = []
@@ -31,7 +34,7 @@ class Firework{
         explosion_delay:0
     };
     constructor(positionX,positionY,explosion_properties,trail_properties,
-        color,starting_velocity,acceleration,explosion_delay){
+        color,starting_velocity,acceleration,explosion_delay,explosion_SFX,trail_SFX){
         this.pos = createVector(0,0);
        this.#originX = positionX
        this.#originY = positionY
@@ -41,6 +44,9 @@ class Firework{
        this.#firework_properties.starting_velocity = createVector(starting_velocity.x,starting_velocity.y)
        this.#firework_properties.acceleration = createVector(acceleration.x,acceleration.y)
        this.#firework_properties.explosion_delay = explosion_delay
+       this.#explosionSFX = explosion_SFX
+       this.#trailSFX = trail_SFX
+       this.#trailSFX[0].play()
     }
     update(){
         //If upward velocity is 0 then explode the firework
@@ -109,9 +115,10 @@ class Firework{
         pop()
     }
     explode(){
+        this.#explosionSFX[floor(random(0,this.#explosionSFX.length))].play()
         for(var i = 0; i<this.#explosion_properties.Particles;i++){
             //create particles for explosion
-            var p = new Particles
+            var p = new Line
             (
                 this.#explosion_properties.color,
                 this.#explosion_properties.radius1,
