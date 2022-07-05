@@ -1,10 +1,34 @@
 
 //next objective
-var fireworkProperties = {
-  name:"Minh",
-  age: 21
+var firework_explosion_properties = {
+  color:[220,43,43], //firework explosion color
+  radius1:10,
+  radius2:20,
+  accelerationX:0,
+  accelerationY:0.01,
+  deleteCondRange1:50,
+  deleteCondRange2:100,
+  Particles:100, //number of particles
+};
+var firework_trail_properties = {
+  color:[204,204,0], //firework trail color
+  radius1:1,
+  radius2:2,
+  accelerationX:0,
+  accelerationY:0.1,
+  deleteCondRange1:20,
+  deleteCondRange2:50,
+  Particles:1, //number of particles
+};
+var firework_properties = {
+  color:[153,102,0], //default color
+  starting_velocityX:0,
+  starting_velocityY:-10,
+  accelerationX:0,
+  accelerationY:0.09,
+  explosion_delay:0
+};
 
-}
 var fireworks = [];
 var particles = [];
 let turn = 1;
@@ -36,10 +60,6 @@ function draw() {
   
   translate(width/2,height/2); //centered
 
-  // if(fireworks.length == 0){
-  //   var fw2 = new Firework(0,0);
-  //   fireworks.push(fw2);
-  // }
   for(var i = fireworks.length-1;i>=0;i--){
     if(!fireworks[i].destroyCond()){
       fireworks[i].show();
@@ -47,10 +67,8 @@ function draw() {
     }else{
       fireworks.splice(i,1)
     }
-    console.log(fireworks.length)
     
   }
-  
 }
 
 function windowResized() {
@@ -59,7 +77,21 @@ function windowResized() {
 }
 //create firework at mouse position
 function mouseClicked(){
-  fireworks.push(new Firework(mouseX-width/2-50,mouseY-height+200,fireworkProperties))
+  firework_explosion_properties.color = [random(10,255),random(10,255),random(10,255)]
+  fireworks.push(
+    new Firework
+      (
+        mouseX-width/2,
+        mouseY-height/2,
+        firework_explosion_properties,
+        firework_trail_properties,
+        //firework properties
+        [153,102,0],
+        createVector(random(-2,2),-10), //starting velocity
+        createVector(0,0.09), //acceleration
+        0, //explosion delay
+      )
+    )
 }
 
 function keyPressed(){

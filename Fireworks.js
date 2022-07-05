@@ -6,48 +6,89 @@ class Firework{
     #exploded = false
     #originX;
     #originY;
-    constructor(positionX,positionY,properties){
-        //console.log(properties.name)
-        this.pos = createVector(50,400);
-        //this.pos = p5.Vector.random2D().mult(250) //position of the particle
-       this.vel = createVector(0,-12) //starting velocity is 0
-       this.acc = createVector(0,0.09) //randomize particle acceleration
+    #explosion_properties = {
+        color:[255,255,255], //default color
+        radius1:10,
+        radius2:20,
+        accelerationX:0,
+        accelerationY:0.01,
+        deleteCondRange1:50,
+        deleteCondRange2:100,
+        Particles:100, //number of particles
+    };
+    #trail_properties = {
+        color:[255,255,255], //default color
+        accelerationX:0,
+        accelerationY:0.1,
+        deleteCondRange1:20,
+        deleteCondRange2:50,
+        Particles:1, //number of particles
+    };
+    #firework_properties = {
+        color:[153,102,0], //default color
+        starting_velocity:createVector(0,-10),
+        acceleration:createVector(0,0.09),
+        explosion_delay:0
+    };
+    constructor(positionX,positionY,explosion_properties,trail_properties,
+        color,starting_velocity,acceleration,explosion_delay){
+        this.pos = createVector(0,0);
        this.#originX = positionX
        this.#originY = positionY
+       this.#explosion_properties = explosion_properties;
+       this.#trail_properties = trail_properties
+       this.#firework_properties.color = color
+       this.#firework_properties.starting_velocity = createVector(starting_velocity.x,starting_velocity.y)
+       this.#firework_properties.acceleration = createVector(acceleration.x,acceleration.y)
+       this.#firework_properties.explosion_delay = explosion_delay
     }
     update(){
         //If upward velocity is 0 then explode the firework
-        if(this.vel.y>0 && !this.#exploded){
+        if(this.#firework_properties.starting_velocity.y>this.#firework_properties.explosion_delay 
+            && !this.#exploded){
             this.explode()
             this.#exploded = true;
         }
         //Cap downward acceleration to make falling more realistic
-        if(!(this.vel.y >12)){
-            this.vel.add(this.acc)
+        if(!(this.#firework_properties.starting_velocity.y >12)){
+            this.#firework_properties.starting_velocity.add(this.#firework_properties.acceleration)
         }
-        this.pos.add(this.vel)
+        this.pos.add(this.#firework_properties.starting_velocity)
     }
     show(){
-        
         push()
         translate(this.#originX,this.#originY)
         //show streak particles
         if(!this.#exploded){
+            //shape of firework
             stroke(0)
             fill(102,102,0)
             ellipse(this.pos.x,this.pos.y,15)
             noStroke()
-            fill(153,153,0)
+            fill(this.#firework_properties.color)
             ellipse(this.pos.x,this.pos.y,13)
             fill(255,247,247)
             ellipse(this.pos.x,this.pos.y,10)
             fill(255)
             ellipse(this.pos.x,this.pos.y,4)
-            var sp = new Particles([220,43,43],1,2,0.1,this.pos,20,50)
-            this.#particleTrail.push(sp)
+            //streak particles
+            for(var i = 0;i<this.#trail_properties.Particles;i++){
+                var sp = new Particles
+                    (
+                        this.#trail_properties.color,
+                        this.#trail_properties.radius1,
+                        this.#trail_properties.radius2,
+                        this.#trail_properties.accelerationX,
+                        this.#trail_properties.accelerationY,
+                        this.pos,
+                        this.#trail_properties.deleteCondRange1,
+                        this.#trail_properties.deleteCondRange2
+                    )
+            this.#particleTrail.push(sp) 
+            }
             
         }
-        //show and update streak particles
+        //show/update streak particles
         for(var i = this.#particleTrail.length-1;i>=0;i--){
             if(!this.#particleTrail[i].destroy()){
                 this.#particleTrail[i].show();
@@ -56,7 +97,7 @@ class Firework{
                 this.#particleTrail.splice(i,1);
             }
         }
-        //show and update explosion particles
+        //show/update explosion particles
         for(var i = this.#explosionParticles.length-1;i>=0;i--){
             if(!this.#explosionParticles[i].destroy()){
                 this.#explosionParticles[i].show();
@@ -68,8 +109,19 @@ class Firework{
         pop()
     }
     explode(){
-        for(var i = 0; i<100;i++){
-            var p = new Particles([220,43,43],10,15,0.01,this.pos,50,100);
+        for(var i = 0; i<this.#explosion_properties.Particles;i++){
+            //create particles for explosion
+            var p = new Particles
+            (
+                this.#explosion_properties.color,
+                this.#explosion_properties.radius1,
+                this.#explosion_properties.radius2,
+                this.#trail_properties.accelerationX,
+                this.#explosion_properties.accelerationY,
+                this.pos,
+                this.#explosion_properties.deleteCondRange1,
+                this.#explosion_properties.deleteCondRange2
+            );
             this.#explosionParticles.push(p);  
         }
     }  
